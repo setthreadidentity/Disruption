@@ -1,4 +1,4 @@
-
+-- (WARNING: This Repository is Licensed! You are not permitted to use/copy this User Interface library)
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -788,116 +788,275 @@ function library:CreateWindow(name, size, hidebutton)
                 sector:FixSize()
                 return label
             end          
-            
-            local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
 
-function sector:AddPlayerList()
-    local playerListFrame = Instance.new("Frame", sector.Items)
-    playerListFrame.Name = "PlayerList"
-    playerListFrame.BackgroundTransparency = 1
-    playerListFrame.Size = UDim2.new(1, 0, 0, 0)
-    playerListFrame.AutomaticSize = Enum.AutomaticSize.Y
-    playerListFrame.LayoutOrder = 1
-
-    -- Layout for player list
-    local layout = Instance.new("UIListLayout", playerListFrame)
-    layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 5)
-
-    -- Function to create a clickable label for each player
-    local function createPlayerLabel(player)
-        local playerLabel = Instance.new("TextButton", playerListFrame)  -- Use TextButton instead of TextLabel for clickability
-        playerLabel.Name = player.Name .. "_Label"
-        playerLabel.Text = player.Name
-        playerLabel.BackgroundTransparency = 1
-        playerLabel.Size = UDim2.new(1, 0, 0, 20)
-        playerLabel.Font = window.theme.font
-        playerLabel.TextColor3 = window.theme.itemscolor
-        playerLabel.TextSize = 15
-        playerLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-        -- Function to teleport the local player to the selected player
-        local function teleportToPlayer(targetPlayer)
-            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and
-               targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-            end
-        end
-
-        -- Click event to open a small menu with "Teleport" option
-        playerLabel.MouseButton1Click:Connect(function()
-            -- Create a small menu for the teleport option
-            local teleportMenu = Instance.new("Frame", playerLabel)
-            teleportMenu.Size = UDim2.new(0, 100, 0, 30)
-            teleportMenu.Position = UDim2.new(0, 0, 1, 0)
-            teleportMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            teleportMenu.BorderSizePixel = 0
-            teleportMenu.ZIndex = 5
-
-            local teleportButton = Instance.new("TextButton", teleportMenu)
-            teleportButton.Size = UDim2.new(1, 0, 1, 0)
-            teleportButton.Text = "Teleport"
-            teleportButton.Font = Enum.Font.SourceSans
-            teleportButton.TextSize = 14
-            teleportButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-            teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            teleportButton.ZIndex = 6
-
-            -- When teleport button is clicked, teleport to the selected player
-            teleportButton.MouseButton1Click:Connect(function()
-                teleportToPlayer(player)
-                teleportMenu:Destroy() -- Close the menu after teleporting
-            end)
-
-            -- Hide the menu if clicked outside
-            local function hideMenu()
-                teleportMenu:Destroy()
-            end
-
-            -- Connect hiding the menu to an outside click event
-            local function outsideClick(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 and teleportMenu and not teleportMenu:IsDescendantOf(playerLabel) then
-                    hideMenu()
+            function sector:PlayerList(Properties)
+                if not Properties then
+                    Properties = {}
                 end
-            end
-
-            game:GetService("UserInputService").InputBegan:Connect(outsideClick)
-        end)
-
-        return playerLabel
-    end
-
-    -- Populate initial player list
-    for _, player in ipairs(Players:GetPlayers()) do
-        createPlayerLabel(player)
-    end
-
-    -- Update list when new players join
-    Players.PlayerAdded:Connect(createPlayerLabel)
-
-    -- Remove player's label when they leave
-    Players.PlayerRemoving:Connect(function(player)
-        local playerLabel = playerListFrame:FindFirstChild(player.Name .. "_Label")
-        if playerLabel then
-            playerLabel:Destroy()
-        end
-    end)
-
-    -- Update theme dynamically
-    updateevent.Event:Connect(function(theme)
-        for _, playerLabel in ipairs(playerListFrame:GetChildren()) do
-            if playerLabel:IsA("TextButton") then
-                playerLabel.Font = theme.font
-                playerLabel.TextColor3 = theme.itemscolor
-            end
-        end
-    end)
-
-    sector:FixSize()
-    return playerListFrame
-end
-
+                --
+                local Playerlist = {
+                    Page = self,
+                    Players = {},
+                    CurrentPlayer = nil;
+                    LastPlayer = nil;
+                    Flag = (
+                        Properties.flag
+                            or Properties.Flag
+                            or Properties.pointer
+                            or Properties.Pointer
+                            or Library.NextFlag()
+                    ),
+                }
+                --
+                local NewPlayer = Instance.new("Frame")
+                NewPlayer.Name = "NewPlayer"
+                NewPlayer.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                NewPlayer.BorderColor3 = Color3.fromRGB(50,50,50)
+                NewPlayer.BorderSizePixel = 1
+                NewPlayer.Size = UDim2.new(1, 0, 0,342)
+                NewPlayer.Parent = Playerlist.Page.Elements.Main
+                
+                local Outline4 = Instance.new("Frame")
+                Outline4.Name = "Outline"
+                Outline4.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Outline4.BackgroundTransparency = 1
+                Outline4.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Outline4.BorderSizePixel = 0
+                Outline4.Position = UDim2.new(0, -1, 0, -1)
+                Outline4.Size = UDim2.new(1, 2, 1, 2)
+                Outline4.Parent = NewPlayer
+    
+                local UIStroke = Instance.new("UIStroke")
+                UIStroke.Name = "UIStroke"
+                UIStroke.LineJoinMode = Enum.LineJoinMode.Miter
+                UIStroke.Parent = Outline4
+    
+                local SectionTop = Instance.new("Frame")
+                SectionTop.Name = "SectionTop"
+                SectionTop.BackgroundColor3 = Color3.fromRGB(20,20,20)
+                SectionTop.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                SectionTop.BorderSizePixel = 0
+                SectionTop.Size = UDim2.new(1, 0, 0, 20)
+                
+                local Accent = Library:NewInstance("Frame", true)
+                Accent.Name = "Accent"
+                Accent.BackgroundColor3 = Library.Accent
+                Accent.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Accent.BorderSizePixel = 0
+                Accent.Size = UDim2.new(1, 0, 0, 1)
+                Accent.Parent = SectionTop
+    
+                local SectionName = Instance.new("TextLabel")
+                SectionName.Name = "SectionName"
+                SectionName.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+                SectionName.Text = "Player List"
+                SectionName.TextColor3 = Color3.fromRGB(255, 255, 255)
+                SectionName.TextSize = Library.FSize
+                SectionName.TextStrokeTransparency = 0
+                SectionName.TextXAlignment = Enum.TextXAlignment.Left
+                SectionName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SectionName.BackgroundTransparency = 1
+                SectionName.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                SectionName.BorderSizePixel = 0
+                SectionName.Position = UDim2.new(0, 5, 0, 0)
+                SectionName.Size = UDim2.new(1, 0, 1, 0)
+                SectionName.Parent = SectionTop
+    
+                SectionTop.Parent = NewPlayer
+    
+                local List = Library:NewInstance("ScrollingFrame", true)
+                List.Name = "List"
+                List.AutomaticCanvasSize = Enum.AutomaticSize.Y
+                List.BottomImage = "rbxassetid://7783554086"
+                List.CanvasSize = UDim2.new()
+                List.MidImage = "rbxassetid://7783554086"
+                List.ScrollBarImageColor3 = Library.Accent
+                List.ScrollBarThickness = 8
+                List.TopImage = "rbxassetid://7783554086"
+                List.Active = true
+                List.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                List.BorderColor3 = Color3.fromRGB(50,50,50)
+                List.BorderSizePixel = 1
+                List.Position = UDim2.new(0, 5, 0, 25)
+                List.Size = UDim2.new(1, -10, 0, 225)
+                
+                local Outline5 = Instance.new("Frame")
+                Outline5.Name = "Outline"
+                Outline5.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Outline5.BackgroundTransparency = 1
+                Outline5.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Outline5.BorderSizePixel = 0
+                Outline5.Position = UDim2.new(0, 4, 0, 24)
+                Outline5.Size = UDim2.new(1, -8, 0, 227)
+                Outline5.Parent = NewPlayer
+    
+                local UIStroke2 = Instance.new("UIStroke")
+                UIStroke2.Name = "UIStroke"
+                UIStroke2.LineJoinMode = Enum.LineJoinMode.Miter
+                UIStroke2.Parent = Outline5
+    
+                local UIListLayout = Instance.new("UIListLayout")
+                UIListLayout.Name = "UIListLayout"
+                UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                UIListLayout.Parent = List
+    
+                List.Parent = NewPlayer
+    
+                local ImageLabel = Instance.new("ImageLabel")
+                ImageLabel.Name = "ImageLabel"
+                ImageLabel.Image = ""
+                ImageLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                ImageLabel.BorderColor3 = Color3.fromRGB(50,50,50)
+                ImageLabel.Position = UDim2.new(0, 5, 1, -75)
+                ImageLabel.Size = UDim2.new(0, 70, 0, 70)
+                ImageLabel.Parent = NewPlayer
+                
+                local Outline8 = Instance.new("Frame")
+                Outline8.Name = "Outline"
+                Outline8.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Outline8.BackgroundTransparency = 1
+                Outline8.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Outline8.BorderSizePixel = 0
+                Outline8.Position = UDim2.new(0,-1,0,-1)
+                Outline8.Size = UDim2.new(1,2,1,2)
+                Outline8.Parent = ImageLabel
+    
+                local UIStroke5 = Instance.new("UIStroke")
+                UIStroke5.Name = "UIStroke"
+                UIStroke5.LineJoinMode = Enum.LineJoinMode.Miter
+                UIStroke5.Parent = Outline8
+    
+                local PlayerName1 = Instance.new("TextLabel")
+                PlayerName1.Name = "PlayerName"
+                PlayerName1.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+                PlayerName1.Text = "Select a Player."
+                PlayerName1.TextColor3 = Color3.fromRGB(255, 255, 255)
+                PlayerName1.TextSize = Library.FSize
+                PlayerName1.TextStrokeTransparency = 0
+                PlayerName1.TextXAlignment = Enum.TextXAlignment.Left
+                PlayerName1.TextYAlignment = Enum.TextYAlignment.Top
+                PlayerName1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                PlayerName1.BackgroundTransparency = 1
+                PlayerName1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                PlayerName1.BorderSizePixel = 0
+                PlayerName1.Position = UDim2.new(0, 80, 1, -75)
+                PlayerName1.Size = UDim2.new(1, -459, 0, 70)
+                PlayerName1.Parent = NewPlayer
+    
+                local Priority = Instance.new("TextButton")
+                Priority.Name = "Priority"
+                Priority.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
+                Priority.Text = ""
+                Priority.TextColor3 = Color3.fromRGB(0, 0, 0)
+                Priority.TextSize = 14
+                Priority.AutoButtonColor = false
+                Priority.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                Priority.BorderColor3 = Color3.fromRGB(50,50,50)
+                Priority.BorderSizePixel = 1
+                Priority.Position = UDim2.new(1, -105, 1, -70)
+                Priority.Size = UDim2.new(0, 100, 0, 25)
+                
+                local Outline6 = Instance.new("Frame")
+                Outline6.Name = "Outline"
+                Outline6.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Outline6.BackgroundTransparency = 1
+                Outline6.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Outline6.BorderSizePixel = 0
+                Outline6.Position = UDim2.new(0,-1,0,-1)
+                Outline6.Size = UDim2.new(1,2,1,2)
+                Outline6.Parent = Priority
+    
+                local UIStroke3 = Instance.new("UIStroke")
+                UIStroke3.Name = "UIStroke"
+                UIStroke3.LineJoinMode = Enum.LineJoinMode.Miter
+                UIStroke3.Parent = Outline6
+    
+                local PriorityLabel = Instance.new("TextLabel")
+                PriorityLabel.Name = "PriorityLabel"
+                PriorityLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+                PriorityLabel.Text = "Prioritize"
+                PriorityLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                PriorityLabel.TextSize = Library.FSize
+                PriorityLabel.TextStrokeTransparency = 0
+                PriorityLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                PriorityLabel.BackgroundTransparency = 1
+                PriorityLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                PriorityLabel.BorderSizePixel = 0
+                PriorityLabel.Size = UDim2.new(1, 0, 1, 0)
+                PriorityLabel.Parent = Priority
+    
+                Priority.Parent = NewPlayer
+    
+                local Friend = Instance.new("TextButton")
+                Friend.Name = "Friend"
+                Friend.FontFace = Font.new("rbxasset://fonts/families/SourceSansPro.json")
+                Friend.Text = ""
+                Friend.TextColor3 = Color3.fromRGB(0, 0, 0)
+                Friend.TextSize = 14
+                Friend.AutoButtonColor = false
+                Friend.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+                Friend.BorderColor3 = Color3.fromRGB(50,50,50)
+                Friend.BorderSizePixel = 1
+                Friend.Position = UDim2.new(1, -105, 1, -34)
+                Friend.Size = UDim2.new(0, 100, 0, 25)
+                
+                local Outline7 = Instance.new("Frame")
+                Outline7.Name = "Outline"
+                Outline7.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Outline7.BackgroundTransparency = 1
+                Outline7.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                Outline7.BorderSizePixel = 0
+                Outline7.Position = UDim2.new(0,-1,0,-1)
+                Outline7.Size = UDim2.new(1,2,1,2)
+                Outline7.Parent = Friend
+    
+                local UIStroke4 = Instance.new("UIStroke")
+                UIStroke4.Name = "UIStroke"
+                UIStroke4.LineJoinMode = Enum.LineJoinMode.Miter
+                UIStroke4.Parent = Outline7
+    
+                local FriendLabel = Instance.new("TextLabel")
+                FriendLabel.Name = "FriendLabel"
+                FriendLabel.FontFace = Font.fromEnum(Enum.Font.RobotoMono)
+                FriendLabel.Text = "Friendly"
+                FriendLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+                FriendLabel.TextSize = Library.FSize
+                FriendLabel.TextStrokeTransparency = 0
+                FriendLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                FriendLabel.BackgroundTransparency = 1
+                FriendLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                FriendLabel.BorderSizePixel = 0
+                FriendLabel.Size = UDim2.new(1, 0, 1, 0)
+                FriendLabel.Parent = Friend
+    
+                Friend.Parent = NewPlayer
+    
+                -- // Main
+                local chosen = nil
+                local optioninstances = {}
+                local function handleoptionclick(option, button, accent)
+                    button.MouseButton1Click:Connect(function()
+                        chosen = option
+                        Library.Flags[Playerlist.Flag] = option
+                        Playerlist.CurrentPlayer = option
+                        --
+                        for opt, tbl in next, optioninstances do
+                            if opt ~= option then
+                                tbl.accent.Visible = false
+                            end
+                        end
+                        accent.Visible = true
+                        --
+                        if Playerlist.CurrentPlayer ~= Playerlist.LastPlayer then
+                            Playerlist.LastPlayer = Playerlist.CurrentPlayer;
+                            PlayerName1.Text = ("Id : %s\nDisplay Name : %s\nName : %s\nAccount Age : %s"):format(Playerlist.CurrentPlayer.UserId, Playerlist.CurrentPlayer.DisplayName ~= "" and Playerlist.CurrentPlayer.DisplayName or Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.Name, Playerlist.CurrentPlayer.AccountAge)
+                            --
+                            local imagedata = game:GetService("Players"):GetUserThumbnailAsync(Playerlist.CurrentPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+    
+                            ImageLabel.Image = imagedata
+                        end;
+                    end)
+                end
             
             function sector:AddToggle(text, default, callback, flag)
                 local toggle = { }
