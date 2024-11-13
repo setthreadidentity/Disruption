@@ -1,4 +1,4 @@
--- (WARNING: This Repository is Licensed! You are not permitted to use/copy this User Interface library)
+
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -787,7 +787,117 @@ function library:CreateWindow(name, size, hidebutton)
             
                 sector:FixSize()
                 return label
-            end            
+            end          
+            
+            local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+function sector:AddPlayerList()
+    local playerListFrame = Instance.new("Frame", sector.Items)
+    playerListFrame.Name = "PlayerList"
+    playerListFrame.BackgroundTransparency = 1
+    playerListFrame.Size = UDim2.new(1, 0, 0, 0)
+    playerListFrame.AutomaticSize = Enum.AutomaticSize.Y
+    playerListFrame.LayoutOrder = 1
+
+    -- Layout for player list
+    local layout = Instance.new("UIListLayout", playerListFrame)
+    layout.SortOrder = Enum.SortOrder.LayoutOrder
+    layout.Padding = UDim.new(0, 5)
+
+    -- Function to create a clickable label for each player
+    local function createPlayerLabel(player)
+        local playerLabel = Instance.new("TextButton", playerListFrame)  -- Use TextButton instead of TextLabel for clickability
+        playerLabel.Name = player.Name .. "_Label"
+        playerLabel.Text = player.Name
+        playerLabel.BackgroundTransparency = 1
+        playerLabel.Size = UDim2.new(1, 0, 0, 20)
+        playerLabel.Font = window.theme.font
+        playerLabel.TextColor3 = window.theme.itemscolor
+        playerLabel.TextSize = 15
+        playerLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- Function to teleport the local player to the selected player
+        local function teleportToPlayer(targetPlayer)
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and
+               targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                LocalPlayer.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+            end
+        end
+
+        -- Click event to open a small menu with "Teleport" option
+        playerLabel.MouseButton1Click:Connect(function()
+            -- Create a small menu for the teleport option
+            local teleportMenu = Instance.new("Frame", playerLabel)
+            teleportMenu.Size = UDim2.new(0, 100, 0, 30)
+            teleportMenu.Position = UDim2.new(0, 0, 1, 0)
+            teleportMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            teleportMenu.BorderSizePixel = 0
+            teleportMenu.ZIndex = 5
+
+            local teleportButton = Instance.new("TextButton", teleportMenu)
+            teleportButton.Size = UDim2.new(1, 0, 1, 0)
+            teleportButton.Text = "Teleport"
+            teleportButton.Font = Enum.Font.SourceSans
+            teleportButton.TextSize = 14
+            teleportButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            teleportButton.ZIndex = 6
+
+            -- When teleport button is clicked, teleport to the selected player
+            teleportButton.MouseButton1Click:Connect(function()
+                teleportToPlayer(player)
+                teleportMenu:Destroy() -- Close the menu after teleporting
+            end)
+
+            -- Hide the menu if clicked outside
+            local function hideMenu()
+                teleportMenu:Destroy()
+            end
+
+            -- Connect hiding the menu to an outside click event
+            local function outsideClick(input)
+                if input.UserInputType == Enum.UserInputType.MouseButton1 and teleportMenu and not teleportMenu:IsDescendantOf(playerLabel) then
+                    hideMenu()
+                end
+            end
+
+            game:GetService("UserInputService").InputBegan:Connect(outsideClick)
+        end)
+
+        return playerLabel
+    end
+
+    -- Populate initial player list
+    for _, player in ipairs(Players:GetPlayers()) do
+        createPlayerLabel(player)
+    end
+
+    -- Update list when new players join
+    Players.PlayerAdded:Connect(createPlayerLabel)
+
+    -- Remove player's label when they leave
+    Players.PlayerRemoving:Connect(function(player)
+        local playerLabel = playerListFrame:FindFirstChild(player.Name .. "_Label")
+        if playerLabel then
+            playerLabel:Destroy()
+        end
+    end)
+
+    -- Update theme dynamically
+    updateevent.Event:Connect(function(theme)
+        for _, playerLabel in ipairs(playerListFrame:GetChildren()) do
+            if playerLabel:IsA("TextButton") then
+                playerLabel.Font = theme.font
+                playerLabel.TextColor3 = theme.itemscolor
+            end
+        end
+    end)
+
+    sector:FixSize()
+    return playerListFrame
+end
+
             
             function sector:AddToggle(text, default, callback, flag)
                 local toggle = { }
