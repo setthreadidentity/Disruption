@@ -767,11 +767,11 @@ function library:CreateWindow(name, size, hidebutton)
                 if text:find("%[%+%]") then
                     text = text:gsub("%[%+%]", '<font color="rgb(0,255,0)">[+]</font>') 
                 end
-                if text:find("%[%-%]") then
-                    text = text:gsub("%[%-%]", '<font color="rgb(255,255,0)">[-]</font>') 
+                if text:find("%[%/%]") then
+                    text = text:gsub("%[%/%]", '<font color="rgb(255,255,0)">[/]</font>') 
                 end
-                if text:find("%[x%]") then
-                    text = text:gsub("%[x%]", '<font color="rgb(255,0,0)">[x]</font>') 
+                if text:find("%[%-%]") then
+                    text = text:gsub("%[%-%]", '<font color="rgb(255,0,0)">[-]</font>') 
                 end
             
                 label.Main.Text = text
