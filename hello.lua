@@ -217,7 +217,7 @@ end
 function library:CreateWindow(name, size, hidebutton)
     local window = { }
 
-    window.name = name or ""
+    window.name = '<font color="rgb(255, 0, 0)">' .. (name or "") .. '</font>'
     window.size = UDim2.fromOffset(size.X, size.Y) or UDim2.fromOffset(492, 598)
     window.hidebutton = hidebutton or Enum.KeyCode.RightShift
     window.theme = library.theme
@@ -788,7 +788,6 @@ function library:CreateWindow(name, size, hidebutton)
                 sector:FixSize()
                 return label
             end          
-
             
             function sector:AddToggle(text, default, callback, flag)
                 local toggle = { }
