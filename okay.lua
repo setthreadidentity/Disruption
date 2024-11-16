@@ -1,4 +1,4 @@
--- (WARNING: This Repository is Licensed! You are not permitted
+-- (WARNING: This Repository is Licensed! You are not permitted to use/copy this User Interface library)
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -34,9 +34,9 @@ library.theme = {
     outlinecolor = Color3.fromRGB(60, 60, 60),
     outlinecolor2 = Color3.fromRGB(0, 0, 0),
     sectorcolor = Color3.fromRGB(30, 30, 30),
-    toptextcolor = Color3.fromRGB(196, 40, 285),
+    toptextcolor = Color3.fromRGB(250, 107, 214),
     topheight = 48,
-    topcolor = Color3.fromRGB(,30, 30, 30),
+    topcolor = Color3.fromRGB(30, 30, 30),
     topcolor2 = Color3.fromRGB(30, 30, 30),
     buttoncolor = Color3.fromRGB(49, 49, 49),
     buttoncolor2 = Color3.fromRGB(39, 39, 39),
