@@ -1,4 +1,3 @@
--- (WARNING: This Repository is Licensed! You are not permitted to use/copy this User Interface library)
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -230,12 +229,12 @@ function library:CreateWindow(name, size, hidebutton)
 
     window.Main = Instance.new("ScreenGui", coregui)
     window.Main.Name = name
+    window.Main.TextColor3 = Color3.fromRGB(255, 105, 180)
     window.Main.DisplayOrder = 15
     if syn then
         syn.protect_gui(window.Main)
     end
 
-    window.Main.TextColor3 = Color3.fromRGB(255, 105, 180)
 
     if getgenv().uilib then
         getgenv().uilib:Remove()
@@ -355,7 +354,7 @@ function library:CreateWindow(name, size, hidebutton)
     window.NameLabel.Text = window.name
     window.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     window.NameLabel.Font = window.theme.font
-    window.NameLabel.Name = "title"wwwwwwwwwwwwwwwwwwwwwwww
+    window.NameLabel.Name = "title"
     window.NameLabel.Position = UDim2.fromOffset(4, -2)
     window.NameLabel.BackgroundTransparency = 1
     window.NameLabel.Size = UDim2.fromOffset(190, window.TopBar.AbsoluteSize.Y / 2 - 2)
