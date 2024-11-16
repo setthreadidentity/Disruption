@@ -1,3 +1,4 @@
+-- (WARNING:
 local library = { 
 	flags = { }, 
 	items = { } 
@@ -350,7 +351,7 @@ function library:CreateWindow(name, size, hidebutton)
     end)
 
     window.NameLabel = Instance.new("TextLabel", window.TopBar)
-    window.NameLabel.TextColor3 = window.theme.toptextcolor
+    window.NameLabel.TextColor3 = Color3.fromRGB(255, 105, 180)
     window.NameLabel.Text = window.name
     window.NameLabel.TextXAlignment = Enum.TextXAlignment.Left
     window.NameLabel.Font = window.theme.font
